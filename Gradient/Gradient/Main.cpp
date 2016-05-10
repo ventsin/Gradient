@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <windows.h>
 
-class app
+class GradientApp
 {
 public:
 	void render()
@@ -28,9 +28,6 @@ public:
 					vex[3].position = sf::Vector2f(0.f, (float)event.size.height);
 				}
 			}
-			
-			if (demo)
-				generateDemoColors();
 
 			window.clear();
 			window.draw(vex);
@@ -48,10 +45,10 @@ public:
 			if (extension != ".jpg" && extension != ".png" &&
 				extension != ".tga" && extension != ".psd" &&
 				extension != ".bmp" && extension != ".dds")
-				name += ".png";
+				name += ".jpg";
 		}
 		else
-			name += ".png";
+			name += ".jpg";
 
 		sf::RenderTexture tex;
 		tex.create(res.x, res.y);
@@ -63,17 +60,7 @@ public:
 		tex.getTexture().copyToImage().saveToFile(name);
 	}
 
-	void generateDemoColors()
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			vex[i].color.r += rand() % 100 - vex[i].color.r;
-			vex[i].color.g += rand() % 100 - vex[i].color.g;
-			vex[i].color.b += rand() % 100 - vex[i].color.b;
-		}
-	}
-
-	void generateRandomColors()
+	void generateRandomColors(nana::textbox* txt)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -83,6 +70,7 @@ public:
 				ch[j] = (unsigned char)rand() % 255;
 			}
 			vex[i].color = sf::Color(ch[0], ch[1], ch[2]);
+			txt[i].caption(std::to_string((int)ch[0]) + "; " + std::to_string((int)ch[1]) + "; " + std::to_string((int)ch[2]) + "; ");
 		}
 	}
 
@@ -99,30 +87,65 @@ public:
 
 		window.create(sf::VideoMode(width, height), "Preview");
 		nana::form fm;
+		fm.caption("Gradient Generator");
 		fm.size(nana::size(300, 185));
 
 		nana::textbox txt(fm, nana::rectangle{ 10, 10, 280, 20 });
 		txt.tip_string("File name...");
 		txt.multi_lines(false);
 
+		nana::textbox color_reports[4];
+		color_reports[0].create(fm, nana::rectangle{ 140, 42, 150, 20 });
+		color_reports[1].create(fm, nana::rectangle{ 140, 78, 150, 20 });
+		color_reports[2].create(fm, nana::rectangle{ 140, 112, 150, 20 });
+		color_reports[3].create(fm, nana::rectangle{ 140, 148, 150, 20 });
+		color_reports[0].multi_lines(false).editable(false);
+		color_reports[1].multi_lines(false).editable(false);
+		color_reports[2].multi_lines(false).editable(false);
+		color_reports[3].multi_lines(false).editable(false);
+
 		nana::button btn1(fm, nana::rectangle{ 25, 40, 100, 25 });
 		btn1.caption("Generate");
-		btn1.events().click([this](){
-			generateRandomColors();});
+		btn1.events().click([&](){
+			generateRandomColors(color_reports);});
 
 		nana::button btn2(fm, nana::rectangle{ 25, 75, 100, 25 });
-		btn2.caption("Demo");
+		btn2.caption("Manual");
 		btn2.events().click([&]() {
-			if (demo)
+			nana::inputbox::integer red1("Red 1", 100, 1, 255, 1);
+			nana::inputbox::integer red2("Red 2", 100, 1, 255, 1);
+			nana::inputbox::integer red3("Red 3", 100, 1, 255, 1);
+			nana::inputbox::integer red4("Red 4", 100, 1, 255, 1);
+			nana::inputbox::integer gre1("Green 1", 100, 1, 255, 1);
+			nana::inputbox::integer gre2("Green 2", 100, 1, 255, 1);
+			nana::inputbox::integer gre3("Green 3", 100, 1, 255, 1);
+			nana::inputbox::integer gre4("Green 4", 100, 1, 255, 1);
+			nana::inputbox::integer blu1("Blue 1", 100, 1, 255, 1);
+			nana::inputbox::integer blu2("Blue 2", 100, 1, 255, 1);
+			nana::inputbox::integer blu3("Blue 3", 100, 1, 255, 1);
+			nana::inputbox::integer blu4("Blue 4", 100, 1, 255, 1);
+
+			nana::inputbox inbox(fm, "Please fill in the <bold>color array</>.", "Color array");
+
+			if (inbox.show(red1, red2, red3, red4, gre1, gre2, gre3, gre4, blu1, blu2, blu3, blu4))
 			{
-				demo = false;
-				btn1.enabled(true);
+				unsigned char ch[12];
+				ch[0] = (unsigned char)red1.value(); ch[1] = (unsigned char)gre1.value(); ch[2] = (unsigned char)blu1.value();
+				ch[3] = (unsigned char)red2.value(); ch[4] = (unsigned char)gre2.value(); ch[5] = (unsigned char)blu2.value();
+				ch[6] = (unsigned char)red3.value(); ch[7] = (unsigned char)gre3.value(); ch[8] = (unsigned char)blu3.value();
+				ch[9] = (unsigned char)red3.value(); ch[10] = (unsigned char)gre3.value(); ch[11] = (unsigned char)blu3.value();
+
+				vex[0].color = sf::Color(ch[0], ch[1], ch[2]);
+				vex[1].color = sf::Color(ch[3], ch[4], ch[5]);
+				vex[2].color = sf::Color(ch[6], ch[7], ch[8]);
+				vex[3].color = sf::Color(ch[9], ch[10], ch[11]);
+
+				color_reports[0].caption(std::to_string((int)ch[0]) + "; " + std::to_string((int)ch[1]) + "; " + std::to_string((int)ch[2]) + "; ");
+				color_reports[1].caption(std::to_string((int)ch[3]) + "; " + std::to_string((int)ch[4]) + "; " + std::to_string((int)ch[5]) + "; ");
+				color_reports[2].caption(std::to_string((int)ch[6]) + "; " + std::to_string((int)ch[7]) + "; " + std::to_string((int)ch[8]) + "; ");
+				color_reports[3].caption(std::to_string((int)ch[9]) + "; " + std::to_string((int)ch[10]) + "; " + std::to_string((int)ch[11]) + "; ");
 			}
-			else
-			{
-				demo = true;
-				btn1.enabled(false);
-			}});
+	});
 
 		nana::button btn3(fm, nana::rectangle{ 25, 110, 100, 25 });
 		btn3.caption("Preview");
@@ -137,11 +160,10 @@ public:
 		btn4.events().click([&]() {
 			save(txt.caption()); });
 
-
 		nana::timer timer;
 
 		timer.interval(50);
-		timer.elapse(std::bind(&app::render, this));
+		timer.elapse(std::bind(&GradientApp::render, this));
 		timer.start();
 
 		fm.show();
@@ -151,7 +173,6 @@ public:
 	sf::RenderWindow window;
 	sf::VertexArray vex;
 	sf::Vector2f res;
-	bool demo = false;
 };
 
 int CALLBACK WinMain(
@@ -160,7 +181,7 @@ int CALLBACK WinMain(
 	LPSTR       lpCmdLine,
 	int         nCmdShow)
 {
-	app app;
+	GradientApp app;
 	app.go(500.f, 500.f);
 	return 0;
 }
