@@ -62,16 +62,20 @@ public:
 
 	void generateRandomColors(nana::textbox* txt)
 	{
+		unsigned char ch[4][3];
+	
 		for (int i = 0; i < 4; i++)
 		{
-			unsigned char ch[3];
 			for (int j = 0; j < 3; j++)
 			{
-				ch[j] = (unsigned char)rand() % 255;
+				ch[i][j] = (unsigned char)rand() % 255;
 			}
-			vex[i].color = sf::Color(ch[0], ch[1], ch[2]);
-			txt[i].caption(std::to_string((int)ch[0]) + "; " + std::to_string((int)ch[1]) + "; " + std::to_string((int)ch[2]) + "; ");
+			vex[i].color = sf::Color(ch[i][0], ch[i][1], ch[i][2]);
 		}
+		txt->caption('[' + std::to_string((int)ch[0][0]) + "; " + std::to_string((int)ch[0][1]) + "; " + std::to_string((int)ch[0][2]) + ";]"
+			+ '[' + std::to_string((int)ch[1][0]) + "; " + std::to_string((int)ch[1][1]) + "; " + std::to_string((int)ch[1][2]) + ";]"
+			+ '[' + std::to_string((int)ch[2][0]) + "; " + std::to_string((int)ch[2][1]) + "; " + std::to_string((int)ch[2][2]) + ";]"
+			+ '[' + std::to_string((int)ch[3][0]) + "; " + std::to_string((int)ch[3][1]) + "; " + std::to_string((int)ch[3][2]) + ";]");
 	}
 
 	void go(float width, float height)
@@ -94,22 +98,16 @@ public:
 		txt.tip_string("File name...");
 		txt.multi_lines(false);
 
-		nana::textbox color_reports[4];
-		color_reports[0].create(fm, nana::rectangle{ 140, 42, 150, 20 });
-		color_reports[1].create(fm, nana::rectangle{ 140, 78, 150, 20 });
-		color_reports[2].create(fm, nana::rectangle{ 140, 112, 150, 20 });
-		color_reports[3].create(fm, nana::rectangle{ 140, 148, 150, 20 });
-		color_reports[0].multi_lines(false).editable(false);
-		color_reports[1].multi_lines(false).editable(false);
-		color_reports[2].multi_lines(false).editable(false);
-		color_reports[3].multi_lines(false).editable(false);
-
-		nana::button btn1(fm, nana::rectangle{ 25, 40, 100, 25 });
+		nana::textbox color_report;
+		color_report.create(fm, nana::rectangle{ 10, 40, 280, 20 });
+		color_report.multi_lines(false).editable(false);
+		
+		nana::button btn1(fm, nana::rectangle{ 25, 70, 100, 25 });
 		btn1.caption("Generate");
 		btn1.events().click([&](){
-			generateRandomColors(color_reports);});
+			generateRandomColors(&color_report);});
 
-		nana::button btn2(fm, nana::rectangle{ 25, 75, 100, 25 });
+		nana::button btn2(fm, nana::rectangle{ 178, 70, 100, 25 });
 		btn2.caption("Manual");
 		btn2.events().click([&]() {
 			nana::inputbox::integer red1("Red 1", 100, 1, 255, 1);
@@ -129,25 +127,25 @@ public:
 
 			if (inbox.show(red1, red2, red3, red4, gre1, gre2, gre3, gre4, blu1, blu2, blu3, blu4))
 			{
-				unsigned char ch[12];
-				ch[0] = (unsigned char)red1.value(); ch[1] = (unsigned char)gre1.value(); ch[2] = (unsigned char)blu1.value();
-				ch[3] = (unsigned char)red2.value(); ch[4] = (unsigned char)gre2.value(); ch[5] = (unsigned char)blu2.value();
-				ch[6] = (unsigned char)red3.value(); ch[7] = (unsigned char)gre3.value(); ch[8] = (unsigned char)blu3.value();
-				ch[9] = (unsigned char)red3.value(); ch[10] = (unsigned char)gre3.value(); ch[11] = (unsigned char)blu3.value();
+				unsigned char ch[4][3];
+				ch[0][0] = (unsigned char)red1.value(); ch[0][1] = (unsigned char)gre1.value(); ch[0][2] = (unsigned char)blu1.value();
+				ch[1][0] = (unsigned char)red2.value(); ch[1][1] = (unsigned char)gre2.value(); ch[1][2] = (unsigned char)blu2.value();
+				ch[2][0] = (unsigned char)red3.value(); ch[2][1] = (unsigned char)gre3.value(); ch[2][2] = (unsigned char)blu3.value();
+				ch[3][0] = (unsigned char)red3.value(); ch[3][1] = (unsigned char)gre3.value(); ch[3][2] = (unsigned char)blu3.value();
 
-				vex[0].color = sf::Color(ch[0], ch[1], ch[2]);
-				vex[1].color = sf::Color(ch[3], ch[4], ch[5]);
-				vex[2].color = sf::Color(ch[6], ch[7], ch[8]);
-				vex[3].color = sf::Color(ch[9], ch[10], ch[11]);
+				vex[0].color = sf::Color(ch[0][0], ch[0][1], ch[0][2]);
+				vex[1].color = sf::Color(ch[1][0], ch[1][1], ch[1][2]);
+				vex[2].color = sf::Color(ch[2][0], ch[2][1], ch[2][2]);
+				vex[3].color = sf::Color(ch[3][0], ch[3][1], ch[3][2]);
 
-				color_reports[0].caption(std::to_string((int)ch[0]) + "; " + std::to_string((int)ch[1]) + "; " + std::to_string((int)ch[2]) + "; ");
-				color_reports[1].caption(std::to_string((int)ch[3]) + "; " + std::to_string((int)ch[4]) + "; " + std::to_string((int)ch[5]) + "; ");
-				color_reports[2].caption(std::to_string((int)ch[6]) + "; " + std::to_string((int)ch[7]) + "; " + std::to_string((int)ch[8]) + "; ");
-				color_reports[3].caption(std::to_string((int)ch[9]) + "; " + std::to_string((int)ch[10]) + "; " + std::to_string((int)ch[11]) + "; ");
+				color_report.caption('[' + std::to_string((int)ch[0][0]) + "; " + std::to_string((int)ch[0][1]) + "; " + std::to_string((int)ch[0][2]) + ";]"
+					+ '[' + std::to_string((int)ch[1][0]) + "; " + std::to_string((int)ch[1][1]) + "; " + std::to_string((int)ch[1][2]) + ";]"
+					+ '[' + std::to_string((int)ch[2][0]) + "; " + std::to_string((int)ch[2][1]) + "; " + std::to_string((int)ch[2][2]) + ";]"
+					+ '[' + std::to_string((int)ch[3][0]) + "; " + std::to_string((int)ch[3][1]) + "; " + std::to_string((int)ch[3][2]) + ";]");
 			}
 	});
 
-		nana::button btn3(fm, nana::rectangle{ 25, 110, 100, 25 });
+		nana::button btn3(fm, nana::rectangle{ 25, 105, 100, 25 });
 		btn3.caption("Preview");
 		btn3.events().click([&]() {
 			if (!window.isOpen())
@@ -155,9 +153,40 @@ public:
 			else
 				window.close(); });
 
-		nana::button btn4(fm, nana::rectangle{ 25, 145, 100, 25 });
-		btn4.caption("Save");
-		btn4.events().click([&]() {
+		nana::button btn4(fm, nana::rectangle{ 178, 105, 100, 25 });
+		btn4.caption("Save N");
+		btn4.events().click([&]()
+		{
+			nana::inputbox::integer n_files("", 10, 1, 1000, 1);
+			
+			nana::inputbox inbox(fm, "Please fill in the <bold>number of files</> to save.", "Save N");
+
+			if (inbox.show(n_files))
+			{
+				for (size_t n = 0; n < n_files.value(); n++)
+				{
+					generateRandomColors(&color_report);
+					
+					std::string str = txt.caption();
+					size_t it = str.rfind('.');
+					if (it != std::string::npos)
+						str = "grad/" + str.substr(0, it) + std::to_string(n) + str.substr(it);
+					else
+						str = "grad/" + str + std::to_string(n);
+
+					save(str);
+				}
+			}
+		});
+
+		nana::button btn5(fm, nana::rectangle{ 25, 140, 100, 25 });
+		btn5.caption("Save");
+		btn5.events().click([&]() {
+			save(txt.caption()); });
+
+		nana::button btn6(fm, nana::rectangle{ 178, 140, 100, 25 });
+		btn6.caption("Save");
+		btn6.events().click([&]() {
 			save(txt.caption()); });
 
 		nana::timer timer;
